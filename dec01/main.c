@@ -2,14 +2,14 @@
 #include <stdlib.h>
 
 void calculateThreeHighest(int *highest, int *highest2, int *highest3, int newValue) {
-    if(newValue > *highest) {
-        highest3 = highest2;
-        highest2 = highest;
+    if(newValue >= *highest) {
+        *highest3 = *highest2;
+        *highest2 = *highest;
         *highest = newValue;
-    } else if(newValue > *highest2) {
-        highest3 = highest2;
+    } else if(newValue >= *highest2) {
+        *highest3 = *highest2;
         *highest2 = newValue;
-    } else if(newValue > *highest3) {
+    } else if(newValue >= *highest3) {
         *highest3 = newValue;
     }
 }
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
             elfValue += atoi(line);
         }
     }
-    fprintf(stdout, "%d\n", highest + highest2 + highest3);
+    fprintf(stdout, "%d, %d, %d\n", highest, highest2, highest3);
     fprintf(stdout, "%d\n", max);
     fclose(file);
     return 0;

@@ -5,6 +5,10 @@
 #define PAPER 2
 #define SCISSORS 3
 
+#define WIN 1
+#define TIE 0
+#define LOSE -1
+
 int get_points_from_abc_type(char opponent) {
     if(opponent == 'A') {
         return ROCK;
@@ -28,6 +32,29 @@ int get_points_from_xyz_type(char me) {
         } else {
             fprintf(stderr, "Type %c not recognized", me);
             return 0;
+        }
+}
+
+int get_choise_points_from_opponent_and_win_status(char opponent, int win_status) {
+    int value = (int) opponent - 'A';
+    value = (value + win_status) % 3 + 1;
+    fprintf(stderr, "Opponent choose: %c, win_status = %d, value = %d\n", opponent, win_status,value);
+    if(value == 0) {
+        value = 3;
+    }
+    return value;
+}
+
+int get_win_lose_status(char win_status) {
+        if(win_status == 'X') {
+            return LOSE;
+        } else if (win_status == 'Y') {
+            return TIE;
+        } else if (win_status == 'Z') {
+            return WIN;
+        } else {
+            fprintf(stderr, "Type %c not recognized", win_status);
+            return -10;
         }
 }
 
@@ -60,16 +87,35 @@ void calculate_round(char opponent, char me, int *points_opponent, int *points_m
 
     int winner = calculate_winner(opponent, me);
     if(winner == -1) {
-    fprintf(stdout, "Opponent wins: %c %c \n", opponent, me);
+    //fprintf(stdout, "Opponent wins: %c %c \n", opponent, me);
         *points_opponent += 6;
     } else if (winner == 1) {
-    fprintf(stdout, "Me wins: %c %c \n", opponent, me);
+    //fprintf(stdout, "Me wins: %c %c \n", opponent, me);
         *points_me += 6;
     } else {
-    fprintf(stdout, "Tie: %c %c \n", opponent, me);
+    //fprintf(stdout, "Tie: %c %c \n", opponent, me);
         *points_opponent += 3;
         *points_me += 3;
     }
+}
+
+void calculate_round_second(char opponent, char win_status, int *points_opponent, int *points_me) {
+    *points_opponent += get_points_from_abc_type(opponent);
+    int winner = get_win_lose_status(win_status);
+    *points_me += get_choise_points_from_opponent_and_win_status(opponent, winner);
+
+    if(winner == -1) {
+    fprintf(stdout, "Opponent wins: %c %c \n", opponent, win_status);
+        *points_opponent += 6;
+    } else if (winner == 1) {
+    fprintf(stdout, "Me wins: %c %c \n", opponent, win_status);
+        *points_me += 6;
+    } else {
+    fprintf(stdout, "Tie: %c %c \n", opponent, win_status);
+        *points_opponent += 3;
+        *points_me += 3;
+    }
+
 }
 
 
@@ -91,15 +137,19 @@ int main(int argc, char** argv) {
 
     char opponent;
     char me;
-    int points_opponent;
-    int points_me;
+    int points_opponent = 0;
+    int points_me = 0;
+        int points_opponent_second = 0;
+        int points_me_second = 0;
 
     while(fscanf(file, "%c %c\n", &opponent, &me) != -1) {
         //fprintf(stdout, "p1: %c, p2: %c\n", opponent, me);
         calculate_round(opponent, me, &points_opponent, &points_me);
+        calculate_round_second(opponent, me, &points_opponent_second, &points_me_second);
     }
 
     fprintf(stdout, "Points: opponent: %d, me: %d\n", points_opponent, points_me);
+    fprintf(stdout, "Points: opponent: %d, me: %d\n", points_opponent_second, points_me_second);
     fclose(file);
     return 0;
 }

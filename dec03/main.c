@@ -49,6 +49,17 @@ int calculate_duplicate_values(char *line) {
     return 0;
 }
 
+int calculate_groups(char *line, char *line2, char *line3) {
+    for(int i = 0; i < strlen(line); i++) {
+        if(is_duplicate_in_other_compartment(line[i], line2)) {
+            if(is_duplicate_in_other_compartment(line[i], line3)){
+                return get_valuation_of_item(line[i]);
+            }
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "Program takes two arguments\n");
@@ -64,10 +75,23 @@ int main(int argc, char **argv) {
         return -1;
     }
     int total_value = 0;
-    char line[60];
+    int total_value_group = 0;
+    char line[60], line2[60], line3[60];
     while (fscanf(file, "%s\n", line) != -1) {
+        if(fscanf(file, "%s\n", line2) == -1){
+            fprintf(stderr, "partial group read failed");
+            return -1;
+        }
+        if(fscanf(file, "%s\n", line3) == -1) {
+            fprintf(stderr, "partial group read failed");
+            return -1;
+        }
+        total_value_group += calculate_groups(line, line2, line3);
         total_value += calculate_duplicate_values(line);
+        total_value += calculate_duplicate_values(line2);
+        total_value += calculate_duplicate_values(line3);
     }
-    fprintf(stdout, "%d\n", total_value);
+    fprintf(stdout, "First task: %d\n", total_value);
+    fprintf(stdout, "Second task: %d\n", total_value_group);
     return 0;
 }

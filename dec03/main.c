@@ -3,9 +3,8 @@
 #include <stdlib.h>
 
 int is_duplicate_in_other_compartment(char character, char *other_compartment) {
-    char input[2];
+    char input[1];
     input[0] = character;
-    input[1] = '\0';
     char *ret = strstr(other_compartment, input);
     if (ret) {
         return 1;
@@ -32,7 +31,6 @@ char *substr(char *input, int start, int length) {
 }
 
 int calculate_duplicate_values(char *line) {
-
     int length = strlen(line);
     if (length % 2 != 0) {
         fprintf(stderr, "Line not even length, line: %s, length: %d\n", line, length);
@@ -50,9 +48,9 @@ int calculate_duplicate_values(char *line) {
 }
 
 int calculate_groups(char *line, char *line2, char *line3) {
-    for(int i = 0; i < strlen(line); i++) {
-        if(is_duplicate_in_other_compartment(line[i], line2)) {
-            if(is_duplicate_in_other_compartment(line[i], line3)){
+    for (int i = 0; i < strlen(line); i++) {
+        if (is_duplicate_in_other_compartment(line[i], line2)) {
+            if (is_duplicate_in_other_compartment(line[i], line3)) {
                 return get_valuation_of_item(line[i]);
             }
         }
@@ -78,11 +76,11 @@ int main(int argc, char **argv) {
     int total_value_group = 0;
     char line[60], line2[60], line3[60];
     while (fscanf(file, "%s\n", line) != -1) {
-        if(fscanf(file, "%s\n", line2) == -1){
+        if (fscanf(file, "%s\n", line2) == -1) {
             fprintf(stderr, "partial group read failed");
             return -1;
         }
-        if(fscanf(file, "%s\n", line3) == -1) {
+        if (fscanf(file, "%s\n", line3) == -1) {
             fprintf(stderr, "partial group read failed");
             return -1;
         }

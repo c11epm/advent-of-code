@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
                 //This is first line, ignore
                 continue;
             }
-            if (strstr(line, "ls")) {
+            if (strstr(line, "$ ls")) {
                 continue;
             }
             if (strstr(line, "..")) {
@@ -72,9 +72,7 @@ int main(int argc, char **argv) {
 
     long totalsum = 0;
     for(int i = 0; i < folder_index; i++) {
-        //printf("%d\n", sizes[i]);
         if(sizes[i] < 100000) {
-            printf("Adding: %d\n", sizes[i]);
             totalsum += sizes[i];
         }
     }

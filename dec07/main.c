@@ -6,13 +6,6 @@ int string_starts_with(char *str, char *starts_with) {
     return !strncmp(str, starts_with, strlen(starts_with));
 }
 
-char *substr(char *input, int start, int length) {
-    char *sub = malloc(length + 1);
-    memcpy(sub, input + start, length);
-    sub[length] = '\0';
-    return sub;
-}
-
 void update_value_to_parent(int *parents, int *sizes, int parent, int value) {
     sizes[parent] += value;
     if(parent != 0) {
@@ -69,14 +62,24 @@ int main(int argc, char **argv) {
             update_value_to_parent(parents, sizes, parents[current_folder], s);
         }
     }
-
+    int freeSpace = 70000000-sizes[0];
+    int needed = 30000000-freeSpace;
+    printf("%d\n", freeSpace);
+    printf("%d\n", needed);
+    int smallest = 99999999;
     long totalsum = 0;
     for(int i = 0; i < folder_index; i++) {
         if(sizes[i] < 100000) {
             totalsum += sizes[i];
         }
+        if(sizes[i] > needed) {
+            if(sizes[i] < smallest){
+                smallest = sizes[i];
+            }
+        }
     }
     fprintf(stdout, "%ld\n", totalsum);
+    fprintf(stdout, "%d\n", smallest);
     fclose(file);
     return 0;
 }

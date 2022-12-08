@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define WIDTH 6
-#define LENGTH 6
+#define WIDTH 100
+#define LENGTH 100
 
 int char_to_int(char c) {
     return ((int) (c)) - 48;
@@ -38,28 +38,28 @@ int is_tree_seen(int **height, int row, int col) {
     int seen_bot = 1;
     int tree_height = height[row][col];
     //top
-    for (int i = row; i >= 0; i--) {
+    for (int i = row-1; i >= 0; i--) {
         if (tree_height <= height[i][col]) {
             seen_top = 0;
             break;
         }
     }
     //right
-    for (int i = col; i < WIDTH - 1; i++) {
+    for (int i = col+1; i < WIDTH - 1; i++) {
         if (tree_height <= height[row][i]) {
             seen_right = 0;
             break;
         }
     }
     //left
-    for (int i = col; i >= 0; i--) {
+    for (int i = col-1; i >= 0; i--) {
         if (tree_height <= height[row][i]) {
             seen_left = 0;
             break;
         }
     }
     //bot
-    for (int i = row; i < LENGTH - 1; i++) {
+    for (int i = row+1; i < LENGTH - 1; i++) {
         if (tree_height <= height[i][col]) {
             seen_bot = 0;
             break;

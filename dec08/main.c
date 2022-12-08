@@ -38,28 +38,28 @@ int is_tree_seen(int **height, int row, int col) {
     int seen_bot = 1;
     int tree_height = height[row][col];
     //top
-    for (int i = row-1; i >= 0; i--) {
+    for (int i = row - 1; i >= 0; i--) {
         if (tree_height <= height[i][col]) {
             seen_top = 0;
             break;
         }
     }
     //right
-    for (int i = col+1; i < WIDTH - 1; i++) {
+    for (int i = col + 1; i < WIDTH - 1; i++) {
         if (tree_height <= height[row][i]) {
             seen_right = 0;
             break;
         }
     }
     //left
-    for (int i = col-1; i >= 0; i--) {
+    for (int i = col - 1; i >= 0; i--) {
         if (tree_height <= height[row][i]) {
             seen_left = 0;
             break;
         }
     }
     //bot
-    for (int i = row+1; i < LENGTH - 1; i++) {
+    for (int i = row + 1; i < LENGTH - 1; i++) {
         if (tree_height <= height[i][col]) {
             seen_bot = 0;
             break;
@@ -85,6 +85,57 @@ int sum_trees_seen(int **seen) {
         }
     }
     return seen_trees;
+}
+
+int scenic_score_for_tree(int **height, int row, int col) {
+    //Off by one, becuase, yeah!
+    int seen_top = 1;
+    int seen_right = 1;
+    int seen_left = 1;
+    int seen_bot = 1;
+    int tree_height = height[row][col];
+    //top
+    for (int i = row - 1; i > 0; i--) {
+        if (tree_height <= height[i][col]) {
+            break;
+        }
+        seen_top++;
+    }
+    //right
+    for (int i = col + 1; i < WIDTH - 2; i++) {
+        if (tree_height <= height[row][i]) {
+            break;
+        }
+        seen_right++;
+    }
+    //left
+    for (int i = col - 1; i > 0; i--) {
+        if (tree_height <= height[row][i]) {
+            break;
+        }
+        seen_left++;
+    }
+    //bot
+    for (int i = row + 1; i < LENGTH - 2; i++) {
+        if (tree_height <= height[i][col]) {
+            break;
+        }
+        seen_bot++;
+    }
+    printf("Scenic value for row %d col %d %d %d %d %d %d\n", row, col, seen_top, seen_right, seen_bot, seen_left,
+           seen_bot * seen_right * seen_left * seen_top);
+    return seen_bot * seen_right * seen_top * seen_left;
+}
+
+int highest_scenic_tree_value(int **height) {
+    int scenic = 0;
+    for (int row = 1; row < LENGTH - 2; row++) {
+        for (int col = 1; col < WIDTH - 2; col++) {
+            int scenic_tree = scenic_score_for_tree(height, row, col);
+            if (scenic_tree > scenic) scenic = scenic_tree;
+        }
+    }
+    return scenic;
 }
 
 int main(int argc, char **argv) {
@@ -127,6 +178,7 @@ int main(int argc, char **argv) {
     print(tree_seen);
 
     printf("%d\n", sum_trees_seen(tree_seen));
+    printf("%d\n", highest_scenic_tree_value(tree_height));
 
     fclose(file);
 

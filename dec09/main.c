@@ -52,7 +52,7 @@ void move_head_direction(end *head, char dir) {
 void move_tail(end *tail, end *head, int **visited) {
     if(abs(tail->x - head->x) > 1) {
         if(tail->y == head->y) {
-            tail->y = tail->y + (head->x > tail->x ? 1 : -1);
+            tail->x = tail->x + (head->x > tail->x ? 1 : -1);
         }
         else {
             tail->y = tail->y + (head->y > tail->y ? 1 : -1);
@@ -65,13 +65,13 @@ void move_tail(end *tail, end *head, int **visited) {
     }
      else if(abs(tail->y - head->y) > 1) {
         if(tail->x == head->x) {
-            tail->x = tail->x + (head->y > tail->y ? 1 : -1);
+            tail->y = tail->y + (head->y > tail->y ? 1 : -1);
         }
         else {
             tail->y = tail->y + (head->y > tail->y ? 1 : -1);
             tail->x = tail->x + (head->x > tail->x ? 1 : -1);
         }
-        printf("B %d %d\n", tail->x, tail->y);
+        printf("head at: %d %d, tail moved to: %d %d\n",head->x, head->y, tail->x, tail->y);
         visited[tail->y][tail->x] = 1;
     }
 
@@ -115,6 +115,7 @@ int main(int argc, char **argv) {
             move_tail(r->tail, r->head, tail_visited);
         }
     }
+    tail_visited[500][500] = 1;
     int visited = 0;
     for(int y = 0; y < 1000; y++){
         for(int x = 0; x <1000; x++) {

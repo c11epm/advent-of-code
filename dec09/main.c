@@ -11,24 +11,6 @@ typedef struct rope {
     end *tail;
 } rope;
 
-typedef struct list {
-    end *pos;
-    struct list *next;
-} list;
-
-int pos_equals(end *pos1, end *pos2) {
-    return pos1->x == pos2->x && pos1->y == pos2->y;
-}
-
-int exists_in_list(list *l, end *pos) {
-    do {
-        if(pos_equals(l->pos, pos)) {
-            return 1;
-        }
-    } while(l->next != NULL);
-    return 0;
-}
-
 void move_head_direction(end *head, char dir) {
     switch (dir) {
         case 'R':
@@ -46,7 +28,6 @@ void move_head_direction(end *head, char dir) {
         default:
             break;
     }
-
 }
 
 void move_tail(end *tail, end *head, int **visited) {
@@ -60,8 +41,7 @@ void move_tail(end *tail, end *head, int **visited) {
         }
 
         printf("head at: %d %d, tail moved to: %d %d\n",head->x, head->y, tail->x, tail->y);
-
-        visited[tail->y][tail->x] = 1;
+        if(visited != NULL) visited[tail->y][tail->x] = 1;
     }
      else if(abs(tail->y - head->y) > 1) {
         if(tail->x == head->x) {
@@ -72,9 +52,16 @@ void move_tail(end *tail, end *head, int **visited) {
             tail->x = tail->x + (head->x > tail->x ? 1 : -1);
         }
         printf("head at: %d %d, tail moved to: %d %d\n",head->x, head->y, tail->x, tail->y);
-        visited[tail->y][tail->x] = 1;
+        if(visited != NULL) visited[tail->y][tail->x] = 1;
     }
+}
 
+void move_second_rope(end **second, char dir, int **tail_visited) {
+    move_head_direction(second[0], dir);
+    for(int i = 1; i < 9; i++) {
+        move_tail(second[i], second[i-1], NULL);
+    }
+    move_tail(second[9], second[8], tail_visited);
 }
 
 int main(int argc, char **argv) {
@@ -95,10 +82,13 @@ int main(int argc, char **argv) {
     char dir;
     int steps;
     int **tail_visited = malloc(sizeof(int *) * 1000);
+    int **second_tail_visited = malloc(sizeof(int *) * 1000);
     for (int i = 0; i < 1000; i++) {
         tail_visited[i] = malloc(sizeof(int) * 1000);
+        second_tail_visited[i] = malloc(sizeof(int) * 1000);
         for(int j = 0; j < 1000; j++) {
             tail_visited[i][j] = 0;
+            second_tail_visited[i][j] = 0;
         }
     }
     rope *r = malloc(sizeof(rope));
@@ -109,21 +99,33 @@ int main(int argc, char **argv) {
 
     r->tail->x = 500;
     r->tail->y = 500;
+
+    end **second_rope = malloc(sizeof(end *) * 10);
+    for(int i = 0; i < 10; i++) {
+        second_rope[i] = malloc(sizeof(end));
+        second_rope[i]->x = 500;
+        second_rope[i]->y = 500;
+    }
     while (fscanf(file, "%c %d\n", &dir, &steps) != -1) {
         for (int i = 0; i < steps; i++) {
             move_head_direction(r->head, dir);
             move_tail(r->tail, r->head, tail_visited);
+            move_second_rope(second_rope, dir, second_tail_visited);
         }
     }
     tail_visited[500][500] = 1;
+    second_tail_visited[500][500] = 1;
     int visited = 0;
+    int second_visited = 0;
     for(int y = 0; y < 1000; y++){
         for(int x = 0; x <1000; x++) {
             visited += tail_visited[y][x];
+            second_visited += second_tail_visited[y][x];
         }
     }
 
     printf("%d\n", visited);
+    printf("%d\n", second_visited);
 
     fclose(file);
     return 0;

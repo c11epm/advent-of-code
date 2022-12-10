@@ -2,12 +2,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CRT_ROWS 6
+#define CRT_COLS 40
+
 void check_signal_strength(int counter, int value, int *cycle_sum) {
-    printf("Counter: %d\n", counter );
     if ((counter - 20) % 40 == 0) {
         int add = (counter * value);
         *cycle_sum += add;
     }
+}
+
+int is_pixel_lit(int counter, int value) {
+    return abs((counter % 40) - value) <= 1;
+}
+
+void update_sprite(char **image, int counter, int value) {
+    int row = counter / 40;
+    int col = counter % 40;
+    int is_lit = is_pixel_lit(counter, value);
+    //Some wierd stuff with last operation trying to access memory outside bounds
+    if(counter < 240) image[row][col] = is_lit == 1 ? '#' : ' ';
 }
 
 int main(int argc, char **argv) {
@@ -31,6 +45,14 @@ int main(int argc, char **argv) {
     int clock_counter = 0;
     int register_x = 1;
     int sum = 0;
+    char **crt = malloc(sizeof(char *) * CRT_ROWS);
+
+    for (int row = 0; row < CRT_ROWS; row++) {
+        crt[row] = malloc(sizeof(char) * CRT_COLS);
+        for (int col = 0; col < CRT_COLS; col++) {
+            crt[row][col] = ' ';
+        }
+    }
 
     while (!done_reading) {
         if (prev_was_add_op) {
@@ -40,6 +62,7 @@ int main(int argc, char **argv) {
             clock_counter++;
             check_signal_strength(clock_counter, register_x, &sum);
             register_x += add;
+            update_sprite(crt, clock_counter, register_x);
             continue;
         }
         if (fscanf(file, "%s\n", line) != -1) {
@@ -47,12 +70,13 @@ int main(int argc, char **argv) {
                 prev_was_add_op = 1;
                 clock_counter++;
                 check_signal_strength(clock_counter, register_x, &sum);
+                update_sprite(crt, clock_counter, register_x);
                 continue;
-            }
-            else if (strcmp(line, "noop") == 0) {
+            } else if (strcmp(line, "noop") == 0) {
                 prev_was_add_op = 0;
                 clock_counter++;
                 check_signal_strength(clock_counter, register_x, &sum);
+                update_sprite(crt, clock_counter, register_x);
             } else {
                 printf("Not recognized command: %s\n", line);
             }
@@ -62,7 +86,12 @@ int main(int argc, char **argv) {
     }
 
     printf("%d\n", sum);
-
+    for (int row = 0; row < CRT_ROWS; row++) {
+        for (int col = 0; col < CRT_COLS; col++) {
+            printf("%c",crt[row][col]);
+        }
+        printf("\n");
+    }
 
     fclose(file);
     return 0;

@@ -65,7 +65,7 @@ int traverse(int x, int y, coordinate *end, int map[ROWS][WIDTH], int **path, in
     if (!is_valid_position(x, y, path, step)) {
         return 0;
     }
-    if (x == end->x && y == end->y) {
+    if (map[y][x] == 1) {
         printf("Goal!\n");
         path[y][x] = step;
         //return 1;
@@ -77,22 +77,22 @@ int traverse(int x, int y, coordinate *end, int map[ROWS][WIDTH], int **path, in
     }
 
     //North
-    if (is_walkable(map[y][x], map[y - 1][x]) && traverse(x, y - 1, end, map, path, step+1)) {
+    if (is_walkable_p2(map[y][x], map[y - 1][x]) && traverse(x, y - 1, end, map, path, step+1)) {
         path[y][x] = step;
         return 1;
     }
     //West
-    if (is_walkable(map[y][x], map[y][x - 1]) && traverse(x - 1, y, end, map, path, step+1)) {
+    if (is_walkable_p2(map[y][x], map[y][x - 1]) && traverse(x - 1, y, end, map, path, step+1)) {
         path[y][x] = step;
         return 1;
     }
     //South
-    if (is_walkable(map[y][x], map[y + 1][x]) && traverse(x, y + 1, end, map, path, step+1)) {
+    if (is_walkable_p2(map[y][x], map[y + 1][x]) && traverse(x, y + 1, end, map, path, step+1)) {
         path[y][x] = step;
         return 1;
     }
     //East
-    if (is_walkable(map[y][x], map[y][x + 1]) && traverse(x + 1, y, end, map, path, step+1)) {
+    if (is_walkable_p2(map[y][x], map[y][x + 1]) && traverse(x + 1, y, end, map, path, step+1)) {
         path[y][x] = step;
         return 1;
     }
@@ -145,10 +145,18 @@ int main(int argc, char **argv) {
         //printf("%s\n", line);
     }
 
-    traverse(start.x, start.y, &end, height_matrix, path, 0);
+    traverse(end.x, end.y, &start, height_matrix, path, 0);
     //BFS(start.x, start.y, &end, height_matrix, path);
     print_matrix_pointer(path);
-
+    int low = 999;
+    for(int r = 0; r < ROWS; r++) {
+        for(int c = 0; c < WIDTH; c++) {
+            if(height_matrix[r][c] < low && path[r][c] == 1) {
+                low = height_matrix[r][c];
+            }
+        }
+    }
+    printf("%d\n", low);
     printf("\n\n");
     print_matrix(height_matrix);
     printf("%d", path[end.y][end.y]);

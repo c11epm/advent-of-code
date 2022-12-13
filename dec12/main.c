@@ -21,6 +21,10 @@ int is_walkable(int from, int to) {
     return (to - from) <= 1;
 }
 
+int is_walkable_p2(int from, int to) {
+    return (to - from) >= -1;
+}
+
 int is_visited(int **path, int x, int y) {
     return path[y][x];
 }
@@ -28,7 +32,7 @@ int is_visited(int **path, int x, int y) {
 void print_matrix(int matrix[ROWS][WIDTH]) {
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < WIDTH; c++) {
-            printf("%2d ", matrix[r][c]);
+            printf("%3d ", matrix[r][c]);
         }
         printf("\n");
     }
@@ -37,13 +41,13 @@ void print_matrix(int matrix[ROWS][WIDTH]) {
 void print_matrix_pointer(int **matrix) {
     for (int r = 0; r < ROWS; r++) {
         for (int c = 0; c < WIDTH; c++) {
-            printf("%2d ", matrix[r][c]);
+            printf("%3d ", matrix[r][c]);
         }
         printf("\n");
     }
 }
 
-int is_valid_position(int x, int y, int **path) {
+int is_valid_position(int x, int y, int **path, int step) {
     if(x < 0 || x >= WIDTH) {
         printf("X out of bounds\n");
         return 0;
@@ -52,47 +56,49 @@ int is_valid_position(int x, int y, int **path) {
         printf("y out of bounds\n");
         return 0;
     }
-    if(path[y][x] == TRIED) {
-        printf("point already visited\n");
-        return 0;
-    }
     return  1;
 }
 
 //Check if next position is possible to move to
 //TODO Maybe some sort of no_of_steps_param?
-int traverse(int x, int y, coordinate *end, int map[ROWS][WIDTH], int **path) {
-    if (!is_valid_position(x, y, path)) {
+int traverse(int x, int y, coordinate *end, int map[ROWS][WIDTH], int **path, int step) {
+    if (!is_valid_position(x, y, path, step)) {
         return 0;
     }
     if (x == end->x && y == end->y) {
         printf("Goal!\n");
-        path[y][x] = PATH;
-        return 1;
-    } else {
-        path[y][x] = TRIED;
+        path[y][x] = step;
+        //return 1;
+    }
+    if(path[y][x] > step) {
+        path[y][x] = step;
+    }else {
+        return 0;
     }
 
     //North
-    if (is_walkable(map[y][x], map[y - 1][x]) && traverse(x, y - 1, end, map, path)) {
-        path[y - 1][x] = PATH;
+    if (is_walkable(map[y][x], map[y - 1][x]) && traverse(x, y - 1, end, map, path, step+1)) {
+        path[y][x] = step;
         return 1;
     }
     //West
-    if (is_walkable(map[y][x], map[y][x - 1]) && traverse(x - 1, y, end, map, path)) {
-        path[y][x - 1] = PATH;
+    if (is_walkable(map[y][x], map[y][x - 1]) && traverse(x - 1, y, end, map, path, step+1)) {
+        path[y][x] = step;
         return 1;
     }
     //South
-    if (is_walkable(map[y][x], map[y + 1][x]) && traverse(x, y + 1, end, map, path)) {
-        path[y + 1][x] = PATH;
+    if (is_walkable(map[y][x], map[y + 1][x]) && traverse(x, y + 1, end, map, path, step+1)) {
+        path[y][x] = step;
         return 1;
     }
     //East
-    if (is_walkable(map[y][x], map[y][x + 1]) && traverse(x + 1, y, end, map, path)) {
-        path[y][x + 1] = PATH;
+    if (is_walkable(map[y][x], map[y][x + 1]) && traverse(x + 1, y, end, map, path, step+1)) {
+        path[y][x] = step;
         return 1;
     }
+
+    //print_matrix_pointer(path);
+    //printf("\n");
     return 0;
 }
 
@@ -120,6 +126,7 @@ int main(int argc, char **argv) {
     while (fscanf(file, "%s\n", line) != -1) {
         path[row] = malloc(sizeof(int) * WIDTH);
         for (int i = 0; i < strlen(line); i++) {
+            path[row][i] = 999;
             if (line[i] == 'S') {
                 start.x = i;
                 start.y = row;
@@ -138,13 +145,13 @@ int main(int argc, char **argv) {
         //printf("%s\n", line);
     }
 
-    traverse(start.x, start.y, &end, height_matrix, path);
+    traverse(start.x, start.y, &end, height_matrix, path, 0);
     //BFS(start.x, start.y, &end, height_matrix, path);
     print_matrix_pointer(path);
 
     printf("\n\n");
     print_matrix(height_matrix);
-
+    printf("%d", path[end.y][end.y]);
     fclose(file);
     return 0;
 }

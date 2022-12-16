@@ -1,64 +1,50 @@
+#!/usr/bin/python3
 import sys
 
 infile = sys.argv[1]
 data = open(infile).read().strip()
-lines = [x for x in data.split('\n')]
+file_rows = [x for x in data.split('\n')]
 
 rocks = set()
-for line in lines:
-    splits = line.split('->')
+for line in file_rows:
     prev_pos = None
-    for point in splits:
+    for point in line.split('->'):
         x, y = point.split(',')
         x = int(x)
         y = int(y)
-        pos = (x, y)
         if prev_pos is not None:
-            delta_x = pos[0] - prev_pos[0]
-            delta_y = pos[1] - prev_pos[1]
-            if abs(delta_y) > 0:
-                y_min = min(pos[1], prev_pos[1])
-                for i in range(y_min, y_min + abs(delta_y) + 1, 1):
-                    new_x = x
-                    new_y = i
-                    rocks.add((new_x, new_y))
-
-            elif abs(delta_x) > 0:
-                x_min = min(pos[0], prev_pos[0])
-                for i in range(x_min, x_min + abs(delta_x) + 1, 1):
-                    new_x = i
-                    new_y = y
-                    rocks.add((new_x, new_y))
-
+            dx = x - prev_pos[0]
+            dy = y - prev_pos[1]
+            length = max(abs(dx), abs(dy))
+            for i in range(length + 1):
+                new_x = prev_pos[0] + i * (1 if dx > 0 else (0 if dx == 0 else -1))
+                new_y = prev_pos[1] + i * (1 if dy > 0 else (0 if dy == 0 else -1))
+                rocks.add((new_x, new_y))
         prev_pos = (x, y)
 
-abyss = max(rock[1] for rock in rocks) + 2
+abyss = 2 + max(r[1] for r in rocks)
+# print(floor)
+lo_x = min(r[0] for r in rocks) - 5000
+hi_x = max(r[0] for r in rocks) + 5000
+for x in range(lo_x, hi_x):
+    rocks.add((x, abyss))
 
-
-
-
-not_done = True
-for i in range(99999999):
-    sand = (500, 0)
-    while not_done:
-        if sand[1] > abyss and (not not_done):
-            not_done = False
-            print(i)
-        if (sand[0], sand[1] + 1) not in rocks:
-            print(f"{i} move down")
-            sand = (sand[0], sand[1] + 1)
-        elif (sand[0] - 1, sand[1] + 1) not in rocks:
-            print(f"{i} move left")
-            sand = (sand[0] - 1, sand[1] + 1)
-        elif (sand[0] + 1, sand[1] + 1) not in rocks:
-            print(f"{i} move right")
-            sand = (sand[0] - 1, sand[1] + 1)
+p1_completed = False
+for t in range(1000000):
+    rock = (500, 0)
+    while True:
+        if rock[1] + 1 >= abyss and (not p1_completed):
+            p1_completed = True
+            print(f"p1: {t}")
+        if (rock[0], rock[1] + 1) not in rocks:
+            rock = (rock[0], rock[1] + 1)
+        elif (rock[0] - 1, rock[1] + 1) not in rocks:
+            rock = (rock[0] - 1, rock[1] + 1)
+        elif (rock[0] + 1, rock[1] + 1) not in rocks:
+            rock = (rock[0] + 1, rock[1] + 1)
         else:
-            print(f"{i} at rest")
             break
-    if sand == (500, 0):
-        print(i + 1)
+    if rock == (500, 0):
+        print(f"p2: {t + 1}")
         break
-    rocks.add(sand)
-
-# print(rocks)
+    rocks.add(rock)

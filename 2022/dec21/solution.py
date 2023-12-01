@@ -25,23 +25,16 @@ monkeys = {}
 for row in file_rows:
     splits = row.split(':')
     name = splits[0]
-    #print(splits)
     value = splits[1].strip()
-    #print(f"-{value}-")
     if (" " in value):
-        #print(value)
-        value_list = value.split(" ")
-        #print(value_list)
-        left, op, right = value_list[0], value_list[1], value_list[2]
+        left, op, right = value.split(" ")
         monkey = Monkey(name, left=left, operation=op, right=right)
         monkeys[monkey.name] = monkey
     else:
         monkey = Monkey(name, value=value)
         monkeys[monkey.name] = monkey
 
-#print(monkeys)
-
-def get_monkey_value(monkey_name):
+def get_monkey_value(monkey_name, mode = 1):
     monkey = monkeys[monkey_name]
 
     if(monkey.value is not None):
@@ -49,6 +42,14 @@ def get_monkey_value(monkey_name):
 
     monkey.left = get_monkey_value(monkey.left)
     monkey.right = get_monkey_value(monkey.right)
+
+    #None check of value and calculate correct value instead by switching the operation "Backwards"
+    if monkey.left is None:
+        pass
+    if monkey.right is None:
+        pass
+
+
 
     monkey.value = eval(f"{monkey.left} {monkey.operation} {monkey.right}")
 
@@ -60,4 +61,7 @@ def get_monkey_value(monkey_name):
         print(f"{monkey.value} was not an Int")
         return 0
 
-print(get_monkey_value('root'))
+monkeys["humn"].value = None
+right_path = 37175119093215
+#            156882979171071
+monkeys['root'].operation = '=='

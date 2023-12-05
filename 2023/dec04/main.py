@@ -3,9 +3,6 @@ import sys
 def string_to_list(str):
     return list(filter(None, str.strip().split(" ")))
 
-def right_in_left(right_item, left):
-    return left.contains(right_item)
-
 def get_score(digits):
     if len(digits) == 0:
         return 0
@@ -13,15 +10,26 @@ def get_score(digits):
 
 file = open(sys.argv[1]).read().strip()
 score = 0
-for line in file.split('\n'):
+scraps = {}
+rows = file.split('\n')
+
+for i in range(len(rows)):
+    scraps[i] = 1
+
+for i, line in enumerate(file.split('\n')):
     parts = line.split(":")
     l1, l2 = parts[1].split("|")
     left = string_to_list(l1)
     right = string_to_list(l2)
     digits = []
-    for i in right:
-        if i in left:
-            digits.append(i)
+    for item in right:
+        if item in left:
+            digits.append(item)
+
+    if len(digits) > 0:
+        for j in range(len(digits)):
+            scraps[i + j + 1] += scraps[i]
     score += get_score(digits)
 
 print(score)
+print(sum(scraps.values()))

@@ -1,7 +1,7 @@
 import sys
 
 file = open(sys.argv[1]).read().strip()
-score = 0
+score = 1
 rows = file.split('\n')
 
 time, distance = file.split("\n")
@@ -13,11 +13,19 @@ distances = [int(i) for i in list(filter(None, d.strip().split(" ")))]
 
 record_beating_races = []
 
+print(times)
+
 for i, race in enumerate(times):
     record_beating_permutations = 0
-    for millis in range(race + 1):
-        pass
+    print(race)
+    for hold_for_millis in range(race + 1):
+        speed = hold_for_millis
+        dist = (times[i]-hold_for_millis) * speed
+        if(dist > distances[i]):
+            record_beating_permutations += 1
         # TODO implement this
     record_beating_races.append(record_beating_permutations)
 
-print(sum(record_beating_races))
+for i in record_beating_races:
+    score *= i
+print(score)
